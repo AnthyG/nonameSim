@@ -583,7 +583,10 @@ var ChrTextPop = function ChrTextPop(cI, text, clr) {
 }
 
 function moveChr(cI, byTo, bxTo, actI) {
-    if (chrs.children[cI] && blcks_ds2[bxTo][byTo] && acts[actI]) {
+    console.log("Moving #" + cI + " to " + bxTo + " :: " + byTo + " || " + actI,
+        blcks_ds2[bxTo][byTo], blcks.children[byTo].children[bxTo].chnc.ds,
+        chrs.children[cI] ? true : false, blcks_ds2[bxTo][byTo] ? true : false, acts[actI] ? true : false);
+    if (chrs.children[cI] && typeof blcks_ds2[bxTo][byTo] === "number" && acts[actI]) {
         var chrC = chrs.children[cI];
         var chr = chrC.c;
 
