@@ -370,6 +370,9 @@ function initGame(seedR2) {
     seed = Math.seed(seedR)();
     console.log(seedR2 + " :: " + seed);
 
+    fpsi = 0;
+    cntr = 0;
+
     var blcks_ds = [];
 
     for (var i = 0; i < tNr; i++) {
