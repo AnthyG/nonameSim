@@ -1,12 +1,7 @@
-Math.seed = function(s) {
-    return function() {
-        s = Math.sin(s) * 10000;
-        return s - Math.floor(s);
-    };
-};
+var tNr = 8;
 
-function interpolationArray(startnum, endnum, spaces) {
-    var spaces = spaces - 1,
+function interpolationArray(startnum, endnum) {
+    var spaces = tNr - 1,
         arr = [],
         temp = spaces;
     var diff = (startnum > endnum) ? startnum - endnum : endnum - startnum;

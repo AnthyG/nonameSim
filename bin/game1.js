@@ -61,6 +61,9 @@ let seedR,
 let chancesRef,
     chances;
 
+var chnks,
+    chnks2;
+
 let inv, // Inventory
     blcks, // Blocks/ Tiles
     // blcks_ds, // Block-Densities
@@ -82,33 +85,6 @@ var header,
     pauseMBtn;
 
 
-
-var makeBlock = function makeBlock(bx, by, r, chnc) {
-    var b = g.rectangle(
-        tSize,
-        tSize,
-        chnc.clr
-    );
-
-    var bA = b.addChild(
-        g.text(
-            chnc.rsrcs.a,
-            "10px Arial",
-            "white"
-        )
-    );
-    b.putCenter(bA);
-
-    b.chnc = chnc;
-    b.r = r;
-
-    b.setPosition(bx * tSize, by * tSize);
-
-    b.vx = 0;
-    b.vy = 0;
-
-    blcks.children[by].addChild(b);
-};
 
 var makeChar = function makeChar(x, y, n, invcm, skills) {
     var skills = skills || [
@@ -180,23 +156,7 @@ var makeChar = function makeChar(x, y, n, invcm, skills) {
 
 
 
-function initGame(seedR2) {
-    g.s.game.s = {
-        assets: g.group(),
-        overlays: g.group()
-    };
-    g.s.game.s.overlays.add(pauseBtn);
-
-    blcks = g.group();
-    objs = g.group();
-    pobjs = g.group();
-
-    chrs = g.group();
-    chrsTP = g.group();
-    chrsAL = g.group();
-
-    chrsAL.visible = false
-
+function initChances() {
     chancesRef = {
         "dirt": 0
     };
@@ -356,6 +316,73 @@ function initGame(seedR2) {
             chances[i].rsrcs.dT[i2] = csum2;
         }
     }
+}
+
+function initSeed(seedR2) {
+    var seedR2 = seedR2 || parseInt(Math.random() * 100 + 1);
+    seedR = seedR2;
+    seed = Math.seed(seedR)();
+    console.log(seedR2 + " :: " + seed);
+}
+
+function initChunks(iX, iY) {
+    var iX = iX || 3;
+    var iY = iY || 3;
+
+    chnks = {};
+    chnks2 = g.group();
+
+    var blcks_ds = [];
+
+    for (var i = 0; i < iX; i++) {
+        for (var i2 = 0; i2 < iY; i2++) {
+            var newChnk = g.group();
+
+            console.log("Setting chunks position", i * tSize * (tNr - 1), i2 * tSize * (tNr - 1));
+            newChnk.setPosition(i * tSize * (tNr - 1), i2 * tSize * (tNr - 1));
+
+            var chnk = makeChunk(i, i2);
+            for (var i3 = 0; i3 < chnk.length; i3++) {
+                newChnk.addChild(g.group());
+
+                for (var i4 = 0; i4 < chnk[i3].length; i4++) {
+                    newChnk.children[i3].addChild(chnk[i3][i4]);
+                }
+            }
+
+            chnks2.addChild(newChnk);
+        }
+    }
+
+    blcks_ds2 = blcks_ds;
+
+    // blcks_ds2 = blcks_ds[0].map(function(col, i) {
+    //     return blcks_ds.map(function(row) {
+    //         return row[i];
+    //     });
+    // });
+
+    // console.log(blcks_ds2);
+}
+
+function initGame(seedR2) {
+    g.s.game.s = {
+        assets: g.group(),
+        overlays: g.group()
+    };
+    g.s.game.s.overlays.add(pauseBtn);
+
+    blcks = g.group();
+    objs = g.group();
+    pobjs = g.group();
+
+    chrs = g.group();
+    chrsTP = g.group();
+    chrsAL = g.group();
+
+    chrsAL.visible = false
+
+    initChances();
 
     inv = {
         // wood: 4 // 4 * wood
@@ -365,50 +392,12 @@ function initGame(seedR2) {
         "waterwalker"
     ]);
 
-    var seedR2 = seedR2 || parseInt(Math.random() * 100 + 1);
-    seedR = seedR2;
-    seed = Math.seed(seedR)();
-    console.log(seedR2 + " :: " + seed);
+    initSeed(seedR2);
 
     fpsi = 0;
     cntr = 0;
 
-    var blcks_ds = [];
-
-    for (var i = 0; i < tNr; i++) {
-        var ri = Math.seed(seed * (i * tSize + 1))();
-        blcks.addChild(g.group());
-        blcks_ds[i] = [];
-
-        for (var i2 = 0; i2 < tNr; i2++) {
-            var ri2 = Math.seed(ri * (i2 * tSize + 1))();
-
-            for (var cir = 0; cir < chances.length && ri2 >= chances[cir].c2; cir++);
-
-            var chnc = JSON.parse(JSON.stringify(chances[cir]));
-
-            makeBlock(i2, i, ri2, chnc);
-
-            blcks_ds[i][i2] = chnc.ds;
-
-            // console.log(i + " :: " + i2 + " :: " + ri2, chnc);
-        }
-    }
-
-    // blcks_ds2 = blcks_ds;
-
-    blcks_ds2 = blcks_ds[0].map(function(col, i) {
-        return blcks_ds.map(function(row) {
-            return row[i];
-        });
-    });
-    // blcks_ds2 = blcks_ds2[0].map(function(col, i) {
-    //     return blcks_ds2.map(function(row) {
-    //         return row[i];
-    //     });
-    // });
-
-    // console.log(blcks_ds2);
+    initChunks();
 
     g.s.game.s.assets.add(blcks, objs, pobjs, chrs);
 }
@@ -821,18 +810,18 @@ function game() {
             chrC.c = chr;
         }
 
-        if (chr.children.actline)
-            g.remove(chr.children.actline);
+        // if (chr.children.actline)
+        //     g.remove(chr.children.actline);
 
-        chr.children.actline = g.line(
-            blcks.children[chr.cacty].children[chr.cactx].chnc.clr,
-            4,
-            chrC.centerX,
-            chrC.centerY,
-            blcks.children[chr.cacty].children[chr.cactx].centerX,
-            blcks.children[chr.cacty].children[chr.cactx].centerY
-        );
-        chrsAL.addChild(chr.children.actline);
+        // chr.children.actline = g.line(
+        //     blcks.children[chr.cacty].children[chr.cactx].chnc.clr,
+        //     4,
+        //     chrC.centerX,
+        //     chrC.centerY,
+        //     blcks.children[chr.cacty].children[chr.cactx].centerX,
+        //     blcks.children[chr.cacty].children[chr.cactx].centerY
+        // );
+        // chrsAL.addChild(chr.children.actline);
 
         chrC.layer = 1;
 
