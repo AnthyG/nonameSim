@@ -392,13 +392,13 @@ function initGame(seedR2) {
         }
     }
 
-    blcks_ds2 = blcks_ds;
+    // blcks_ds2 = blcks_ds;
 
-    // blcks_ds2 = blcks_ds[0].map(function(col, i) {
-    //     return blcks_ds.map(function(row) {
-    //         return row[i];
-    //     });
-    // });
+    blcks_ds2 = blcks_ds[0].map(function(col, i) {
+        return blcks_ds.map(function(row) {
+            return row[i];
+        });
+    });
     // blcks_ds2 = blcks_ds2[0].map(function(col, i) {
     //     return blcks_ds2.map(function(row) {
     //         return row[i];
@@ -583,7 +583,7 @@ var ChrTextPop = function ChrTextPop(cI, text, clr) {
 }
 
 function moveChr(cI, byTo, bxTo, actI) {
-    if (chrs.children[cI] && blcks_ds2[byTo][bxTo] && acts[actI]) {
+    if (chrs.children[cI] && blcks_ds2[bxTo][byTo] && acts[actI]) {
         var chrC = chrs.children[cI];
         var chr = chrC.c;
 
@@ -738,9 +738,8 @@ function game() {
                     b.r = ri2;
                     b.chnc = chnc;
 
-                    console.log(blcks_ds2.length - i, i, i2);
-                    // blcks_ds2[i][i2] = b.chnc.ds;
-                    blcks_ds2[blcks_ds2.length - i][i2] = b.chnc.ds;
+                    blcks_ds2[i2][i] = b.chnc.ds;
+                    // blcks_ds2[blcks_ds2.length - i][i2] = b.chnc.ds;
                 }
 
                 b.fillStyle = b.chnc.clr;
