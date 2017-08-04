@@ -125,7 +125,7 @@ var makeBlock = function makeBlock(bx, by, r, chnc) {
     blcks.children[bx].addChild(b);
 }
 
-var makeChar = function makeChar(x, y, n, skills) {
+var makeChar = function makeChar(x, y, n, invcm, skills) {
     var skills = skills || [
         // "waterwalker"
     ];
@@ -170,8 +170,11 @@ var makeChar = function makeChar(x, y, n, skills) {
         "cacty": 0,
         "cactI": false, // current act index
         "cldwn": 0, // cooldown
+        "invcm": invcm, // Max nr of items in the inv
+        "invc": 0, // Nr of items, currently in the inv
+        "inv": {}, // Inventory
         "skills": skills, // skills
-        "children": {
+        "children": { // some other stuff, like the act-line
             "actline": undefined
         }
     };
@@ -373,7 +376,7 @@ function initGame(seedR2) {
         // wood: 4 // 4 * wood
     };
 
-    makeChar(0 + tSize / 2, 0 + tSize / 2, "Light", [
+    makeChar(0 + tSize / 2, 0 + tSize / 2, "Light", 15, [
         "waterwalker"
     ]);
 
@@ -398,17 +401,6 @@ function initGame(seedR2) {
             var chnc = JSON.parse(JSON.stringify(chances[cir]));
 
             makeBlock(fI, fI2, ri2, chnc);
-
-            /*
-            blcks[fI][fI2] = {
-                "x": i2,
-                "y": i,
-                "w": tSize,
-                "h": tSize,
-                "r": ri2,
-                "chnc": chnc
-            };
-            */
 
             // console.log(i + " :: " + fI + " :: " + i2 + " :: " + fI2 + " :: " + ri2, chnc);
 
@@ -526,31 +518,37 @@ function setup() {
 
 var acts = {
     "gather": function(chr, cI) {
-        var b = blcks.children[chr.cacty].children[chr.cactx];
+        if (chr.invc < chr.invcm) {
+            var b = blcks.children[chr.cacty].children[chr.cactx];
 
-        // console.log("'" + chr.n + "' (#" + cI + ") gathering " + b.chnc.l + " at " + chr.cactx + ", " + chr.cacty, b.chnc);
+            // console.log("'" + chr.n + "' (#" + cI + ") gathering " + b.chnc.l + " at " + chr.cactx + ", " + chr.cacty, b.chnc);
 
-        var iI = b.chnc.rsrcs.a === -2;
-        if (b.chnc.rsrcs.a > 0 || iI) {
-            if (!iI)
-                b.chnc.rsrcs.a--;
+            var iI = b.chnc.rsrcs.a === -2;
+            if (b.chnc.rsrcs.a > 0 || iI) {
+                if (!iI)
+                    b.chnc.rsrcs.a--;
 
-            var collected = false;
-            if (typeof inv[b.chnc.l] === "undefined") {
-                inv[b.chnc.l] = 1;
-                collected = true;
-            } else {
-                inv[b.chnc.l]++;
-                collected = true;
+                var collected = false;
+                if (typeof chr.inv[b.chnc.l] === "undefined") {
+                    chr.inv[b.chnc.l] = 1;
+                    chr.invc++;
+                    collected = true;
+                } else {
+                    chr.inv[b.chnc.l]++;
+                    chr.invc++;
+                    collected = true;
+                }
+                if (collected)
+                    ChrTextPop(cI, b.chnc.l + " +1", "black");
+
+                chr.cldwn = b.chnc.rsrcs.cd;
             }
-            if (collected)
-                ChrTextPop(cI, b.chnc.l + " +1", "black");
+            blcks.children[chr.cacty].children[chr.cactx] = b;
 
-            chr.cldwn = b.chnc.rsrcs.cd;
+            chrs.children[cI].c = chr;
+        } else {
+            ChrTextPop(cI, "Inventory full", "red");
         }
-        blcks.children[chr.cacty].children[chr.cactx] = b;
-
-        chrs.children[cI].c = chr;
     }
 };
 
