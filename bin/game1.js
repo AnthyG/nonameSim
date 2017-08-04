@@ -51,22 +51,24 @@ function load() {
     bg_loadBar.putBottom(loadingText);
 }
 
-var seedR,
+let seedR,
     seed,
     tNr = 8,
     tSize,
     fpsi = 0,
     cntr;
 
-var chancesRef,
+let chancesRef,
     chances;
 
-var inv, // Inventory
+let inv, // Inventory
     blcks, // Blocks/ Tiles
+    // blcks_ds, // Block-Densities
+    blcks_ds2, // Block-Densities 2 (inverted)
     objs, // Random-spawned objects
     pobjs; // Player-made Objects
 
-var chrs, // Characters
+let chrs, // Characters
     sChrs, // Selected Characters
     chrsTP, // Character-Text-Popups
     chrsAL; // Character-Act-Lines
@@ -85,7 +87,7 @@ var makeBlock = function makeBlock(bx, by, r, chnc) {
     var b = g.rectangle(
         tSize,
         tSize,
-        chnc.clr,
+        chnc.clr
     );
 
     var bA = b.addChild(
@@ -97,33 +99,16 @@ var makeBlock = function makeBlock(bx, by, r, chnc) {
     );
     b.putCenter(bA);
 
-    /*
-    {
-        "l": "wood",
-        "clr": "#2ABA66",
-        "rsrcs": {
-            "a": 3,
-            "cd": 4,
-            "d": 30,
-            "dT": {
-                "dirt": 60,
-                "grass": 25,
-                "rocks": 15
-            }
-        }
-    };
-    */
-
     b.chnc = chnc;
     b.r = r;
 
-    b.setPosition(by * tSize, bx * tSize);
+    b.setPosition(bx * tSize, by * tSize);
 
     b.vx = 0;
     b.vy = 0;
 
-    blcks.children[bx].addChild(b);
-}
+    blcks.children[by].addChild(b);
+};
 
 var makeChar = function makeChar(x, y, n, invcm, skills) {
     var skills = skills || [
@@ -191,7 +176,7 @@ var makeChar = function makeChar(x, y, n, invcm, skills) {
     g.pulse(chr, 150, 0.575);
 
     chrs.addChild(chr);
-}
+};
 
 
 
@@ -380,34 +365,47 @@ function initGame(seedR2) {
         "waterwalker"
     ]);
 
-    var seedR2 = seedR2 || parseInt(Math.random() * 100 + 0.0000000000000001);
+    var seedR2 = seedR2 || parseInt(Math.random() * 100 + 1);
     seedR = seedR2;
     seed = Math.seed(seedR)();
     console.log(seedR2 + " :: " + seed);
 
-    var fI = 0;
-    for (var i = 0; i < g.stage.height; i += tSize) {
-        var ri = Math.seed(seed * (i + 1))();
-        //console.log(i + " :: " + ri);
-        blcks.addChild(g.group());
+    var blcks_ds = [];
 
-        var fI2 = 0;
-        for (var i2 = 0; i2 < g.stage.width; i2 += tSize) {
-            var ri2 = Math.seed(ri * (i2 + 1))();
-            //console.log(i2 + " :: " + ri2);
+    for (var i = 0; i < tNr; i++) {
+        var ri = Math.seed(seed * (i * tSize + 1))();
+        blcks.addChild(g.group());
+        blcks_ds[i] = [];
+
+        for (var i2 = 0; i2 < tNr; i2++) {
+            var ri2 = Math.seed(ri * (i2 * tSize + 1))();
 
             for (var cir = 0; cir < chances.length && ri2 >= chances[cir].c2; cir++);
 
             var chnc = JSON.parse(JSON.stringify(chances[cir]));
 
-            makeBlock(fI, fI2, ri2, chnc);
+            makeBlock(i2, i, ri2, chnc);
 
-            // console.log(i + " :: " + fI + " :: " + i2 + " :: " + fI2 + " :: " + ri2, chnc);
+            blcks_ds[i][i2] = chnc.ds;
 
-            fI2++;
+            // console.log(i + " :: " + i2 + " :: " + ri2, chnc);
         }
-        fI++;
     }
+
+    blcks_ds2 = blcks_ds;
+
+    // blcks_ds2 = blcks_ds[0].map(function(col, i) {
+    //     return blcks_ds.map(function(row) {
+    //         return row[i];
+    //     });
+    // });
+    // blcks_ds2 = blcks_ds2[0].map(function(col, i) {
+    //     return blcks_ds2.map(function(row) {
+    //         return row[i];
+    //     });
+    // });
+
+    // console.log(blcks_ds2);
 
     g.s.game.s.assets.add(blcks, objs, pobjs, chrs);
 }
@@ -518,13 +516,14 @@ function setup() {
 
 var acts = {
     "gather": function(chr, cI) {
-        if (chr.invc < chr.invcm) {
-            var b = blcks.children[chr.cacty].children[chr.cactx];
+        var b = blcks.children[chr.cacty].children[chr.cactx];
 
-            // console.log("'" + chr.n + "' (#" + cI + ") gathering " + b.chnc.l + " at " + chr.cactx + ", " + chr.cacty, b.chnc);
+        var iI = b.chnc.rsrcs.a === -2;
+        if (b.chnc.rsrcs.a > 0 || iI) {
+            if (chr.invc < chr.invcm) {
 
-            var iI = b.chnc.rsrcs.a === -2;
-            if (b.chnc.rsrcs.a > 0 || iI) {
+                // console.log("'" + chr.n + "' (#" + cI + ") gathering " + b.chnc.l + " at " + chr.cactx + ", " + chr.cacty, b.chnc);
+
                 if (!iI)
                     b.chnc.rsrcs.a--;
 
@@ -542,12 +541,13 @@ var acts = {
                     ChrTextPop(cI, b.chnc.l + " +1", "black");
 
                 chr.cldwn = b.chnc.rsrcs.cd;
-            }
-            blcks.children[chr.cacty].children[chr.cactx] = b;
 
-            chrs.children[cI].c = chr;
-        } else {
-            ChrTextPop(cI, "Inventory full", "red");
+                blcks.children[chr.cacty].children[chr.cactx] = b;
+
+                chrs.children[cI].c = chr;
+            } else {
+                ChrTextPop(cI, "Inventory full", "red");
+            }
         }
     }
 };
@@ -570,7 +570,7 @@ var ChrTextPop = function ChrTextPop(cI, text, clr) {
 
     var dIF = 60;
     (function(_cI, _chrTP) {
-        var chrTPani = g.pulse(_chrTP, dIF, 0);
+        var chrTPani = g.fadeOut(_chrTP, dIF, 0);
         var chrTPani2 = g.breathe(_chrTP, 1.6, 1.2, dIF / 2);
         chrTPani.onComplete = () => {
             try {
@@ -583,30 +583,11 @@ var ChrTextPop = function ChrTextPop(cI, text, clr) {
 }
 
 function moveChr(cI, byTo, bxTo, actI) {
-    if (chrs.children[cI] && blcks.children[byTo].children[bxTo] && acts[actI]) {
+    if (chrs.children[cI] && blcks_ds2[byTo][bxTo] && acts[actI]) {
         var chrC = chrs.children[cI];
         var chr = chrC.c;
 
         // console.log(chrC, chr);
-
-        var blcks_ds = [];
-
-        for (var i = 0; i < blcks.children.length; i++) {
-            var blcksI = blcks.children[i];
-            blcks_ds[i] = [];
-            for (var i2 = 0; i2 < blcksI.children.length; i2++) {
-                var b = blcksI.children[i2];
-                blcks_ds[i][i2] = b.chnc.ds;
-            }
-        }
-
-        // console.log(blcks_ds);
-
-        var blcks_ds2 = blcks_ds[0].map(function(col, i) {
-            return blcks_ds.map(function(row) {
-                return row[i];
-            });
-        });
 
         var graph = new Graph(blcks_ds2, {
             "diagonal": true
@@ -629,7 +610,7 @@ function moveChr(cI, byTo, bxTo, actI) {
 }
 
 function ButtonInteracts() {
-    if (g.s.game.renderable === true) {
+    if (g.s.game.visible === true) {
         pauseBtn.interact = true;
 
         g.pointer.tap = () => {
@@ -648,12 +629,12 @@ function ButtonInteracts() {
 
         g.pointer.tap = () => {};
     }
-    if (g.s.main.renderable === true) {
+    if (g.s.main.visible === true) {
         playBtn.interact = true;
     } else {
         playBtn.interact = false;
     }
-    if (g.s.pause.renderable === true) {
+    if (g.s.pause.visible === true) {
         pauseRBtn.interact = true;
         pauseMBtn.interact = true;
     } else {
@@ -665,10 +646,10 @@ function ButtonInteracts() {
 function setScreen(nS) {
     // console.log("Screen:", nS);
     for (var x in g.s) {
-        g.s[x].renderable = x === nS;
+        g.s[x].visible = x === nS;
         if (x === "game") {
             for (var x2 in g.s[x].s) {
-                g.s[x].s[x2].renderable = x === nS;
+                g.s[x].s[x2].visible = x === nS;
             }
         }
     }
@@ -756,6 +737,10 @@ function game() {
 
                     b.r = ri2;
                     b.chnc = chnc;
+
+                    console.log(blcks_ds2.length - i, i, i2);
+                    // blcks_ds2[i][i2] = b.chnc.ds;
+                    blcks_ds2[blcks_ds2.length - i][i2] = b.chnc.ds;
                 }
 
                 b.fillStyle = b.chnc.clr;
@@ -869,10 +854,16 @@ let g = hexi(
 tSize = g.canvas.width / tNr;
 
 g.fps = 30;
-g.borderSize = 2;
+g.borderSize = 0;
 g.border = g.borderSize + "px #3BAFDA solid";
 g.backgroundColor = 0x000000;
+
 g.scaleToWindow();
+//Scale the html UI <div> container
+scaleToWindow(document.querySelector("#ui"));
+window.addEventListener("resize", function(event) {
+    scaleToWindow(document.querySelector("#ui"));
+});
 
 g.s = [];
 
