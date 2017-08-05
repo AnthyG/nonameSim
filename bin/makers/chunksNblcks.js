@@ -3,8 +3,8 @@ var makeBlock = function makeBlock(Cx, Cy, bx, by, r, chnc) {
         tSize,
         tSize,
         chnc.clr,
-        "red",
-        2
+        // "red",
+        // 2
     );
 
     var bA = b.addChild(

@@ -41,7 +41,6 @@ function initChunks(iX, iY, sX, sY) {
     }
 
     blcks_ds2 = blcks_ds;
-
     // blcks_ds2 = blcks_ds[0].map(function(col, i) {
     //     return blcks_ds.map(function(row) {
     //         return row[i];
