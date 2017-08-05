@@ -155,7 +155,7 @@ function setup() {
     header.putBottom(playBtn);
     playBtn.interact = true;
     playBtn.release = () => {
-        initGame(38);
+        initGame(38, 3, 3, 0, 0);
         g.state = game;
     };
 
