@@ -12,6 +12,8 @@ function load() {
     // //Display the percentage of files currently loaded
     // console.log(`progress: ${g.loadingProgress}`);
 
+    g.s.loading = g.group();
+
     var bg_load = g.rectangle(
         g.canvas.width,
         g.canvas.height,
@@ -49,6 +51,12 @@ function load() {
         )
     );
     bg_loadBar.putBottom(loadingText);
+
+    if (g.loadingProgress === 100) {
+        g.s.loading.visible = false;
+        g.s.loading.renderable = false;
+        g.s.loading.remove();
+    }
 }
 
 let seedR,
@@ -84,325 +92,11 @@ var header,
     pauseRBtn,
     pauseMBtn;
 
-
-
-var makeChar = function makeChar(x, y, n, invcm, skills) {
-    var skills = skills || [
-        // "waterwalker"
-    ];
-
-    // var chr = g.circle(
-    //     10,
-    //     "",
-    //     "black",
-    //     2
-    // );
-    // var chr2 = chr.addChild(g.circle(
-    //     10,
-    //     "white"
-    // ));
-    // chr2.alpha = 0.5;
-
-    var chr = g.circle(
-        10,
-        "white",
-        "black",
-        2
-    );
-
-    var chrN = chr.addChild(
-        g.text(
-            n,
-            "8px Arial",
-            "white"
-        )
-    );
-    chr.putTop(chrN);
-
-    chr.c = {
-        "n": n, // Name
-        "bx": 0, // blcks[x]
-        "by": 0, // blcks[y]
-        // "x": tSize / 2, // "real" x
-        // "y": tSize / 2, // "real" y
-        "cmove": false, // current move
-        "movearr": [], // array to destination
-        "cactx": 0,
-        "cacty": 0,
-        "cactI": false, // current act index
-        "cldwn": 0, // cooldown
-        "invcm": invcm, // Max nr of items in the inv
-        "invc": 0, // Nr of items, currently in the inv
-        "inv": {}, // Inventory
-        "skills": skills, // skills
-        "children": { // some other stuff, like the act-line
-            "actline": undefined
-        }
-    };
-
-    chr.setPosition(
-        g.stage.width / tNr / 2 - chr.halfWidth,
-        g.stage.width / tNr / 2 - chr.halfHeight
-    );
-
-    chr.vx = 0;
-    chr.vy = 0;
-
-    g.breathe(chr, 1.1, 1.1, 150);
-    g.pulse(chr, 150, 0.575);
-
-    chrs.addChild(chr);
-};
-
-
-
-function initChances() {
-    chancesRef = {
-        "dirt": 0
-    };
-    chances = [{
-        "l": "dirt", // label
-        "clr": "#AA8E69", // colour
-        "c": 10, // chance
-        "ds": 1,
-        /* "density speed", how fast to travel
-        A weight of 0 denotes a wall.
-        A weight cannot be negative.
-        A weight cannot be between 0 and 1 (exclusive).
-        A weight can contain decimal values (greater than 1).
-        */
-        "rsrcs": { // resources
-            "a": -1, // amount (-2 = infinite, -1 = none, 0 = depleted)
-            "cd": 1, // cooldown in seconds, to prevent click-spamming (bringt hier aba nix, weil a=-1 is)
-            "d": 5, // degrade-time in seconds (-1 = infinite)
-            "dT": { // degrades to..
-                "dirt": 25,
-                "grass": 40,
-                "wood": 5,
-                "water": 15,
-                "rocks": 15
-            }
-        }
-    }];
-
-    function new_chnc(l, clr, c, ds, rsrcs) {
-        var exChnc = {
-            "l": "",
-            "clr": "",
-            "c": 0,
-            "ds": 0,
-            "rsrcs": {
-                "a": 0,
-                "cd": 0,
-                "d": 0,
-                "dT": {
-
-                }
-            }
-        };
-
-        var validate = function(tO, ptO) {
-            var nerr = true;
-            var ptO = (ptO ? ptO + "." : "");
-
-            for (var x in tO) {
-                var y = typeof tO[x];
-
-                // console.log(ptO + x + " :: " + (eval("typeof " + ptO + x)) + " :: " + y);
-                if (eval("typeof " + ptO + x + " !== \"" + y + "\"")) {
-                    nerr = false;
-                } else {
-                    var nerr2 = true;
-                    if (y === "object")
-                        nerr2 = validate(tO[x], ptO + x);
-                    if (nerr && !nerr2) {
-                        nerr = nerr2;
-                        // console.log(x + " :: " + nerr2);
-                    }
-
-                    if (nerr) {
-                        // console.log("exChnc." + ptO + x + " = " + ptO + x);
-                        eval("exChnc." + ptO + x + " = " + ptO + x);
-                    }
-                }
-            }
-
-            return nerr;
-        }
-        var nerr = validate(exChnc);
-        // console.log(nerr);
-        if (nerr) {
-            var cRef = chances.push(exChnc) - 1;
-            // console.log(chances[cRef].l);
-            chancesRef[exChnc.l] = cRef;
-        }
-    }
-
-    new_chnc(
-        "grass",
-        "#8CC152",
-        55,
-        1.1, {
-            "a": 1,
-            "cd": 2,
-            "d": 10,
-            "dT": {
-                "dirt": 15,
-                "grass": 65,
-                "wood": 15,
-                "rocks": 10
-            }
-        }
-    );
-    new_chnc(
-        "wood",
-        "#2ABA66",
-        15,
-        1.5, {
-            "a": 3,
-            "cd": 4,
-            "d": 30,
-            "dT": {
-                "dirt": 60,
-                "grass": 25,
-                "rocks": 15
-            }
-        }
-    );
-    new_chnc(
-        "water",
-        "#3BAFDA",
-        13,
-        0, {
-            "a": -2,
-            "cd": 2,
-            "d": 70,
-            "dT": {
-                "dirt": 25,
-                "grass": 32,
-                "wood": 7,
-                "water": 20,
-                "rocks": 16
-            }
-        }
-    );
-    new_chnc(
-        "stone",
-        "#AAB2BD",
-        17,
-        1.2, {
-            "a": 10,
-            "cd": 3,
-            "d": 40,
-            "dT": {
-                "dirt": 34,
-                "grass": 27,
-                "wood": 3,
-                "water": 7,
-                "rocks": 29
-            }
-        }
-    );
-
-    var csum = 0;
-    for (var i = 0; i < chances.length; i++) {
-        csum += (chances[i].c / 100.0);
-        chances[i].c2 = csum;
-
-        var csum2 = 0;
-        for (var i2 in chances[i].rsrcs.dT) {
-            var i2c = chances[i].rsrcs.dT[i2];
-            csum2 += (i2c / 100.0);
-            chances[i].rsrcs.dT[i2] = csum2;
-        }
-    }
-}
-
-function initSeed(seedR2) {
-    var seedR2 = seedR2 || parseInt(Math.random() * 100 + 1);
-    seedR = seedR2;
-    seed = Math.seed(seedR)();
-    console.log(seedR2 + " :: " + seed);
-}
-
-function initChunks(iX, iY) {
-    var iX = iX || 3;
-    var iY = iY || 3;
-
-    chnks = {};
-    chnks2 = g.group();
-
-    var blcks_ds = [];
-
-    for (var i = 0; i < iX; i++) {
-        for (var i2 = 0; i2 < iY; i2++) {
-            var newChnk = g.group();
-
-            console.log("Setting chunks position", i * tSize * (tNr - 1), i2 * tSize * (tNr - 1));
-            newChnk.setPosition(i * tSize * (tNr - 1), i2 * tSize * (tNr - 1));
-
-            var chnk = makeChunk(i, i2);
-            for (var i3 = 0; i3 < chnk.length; i3++) {
-                newChnk.addChild(g.group());
-
-                for (var i4 = 0; i4 < chnk[i3].length; i4++) {
-                    newChnk.children[i3].addChild(chnk[i3][i4]);
-                }
-            }
-
-            chnks2.addChild(newChnk);
-        }
-    }
-
-    blcks_ds2 = blcks_ds;
-
-    // blcks_ds2 = blcks_ds[0].map(function(col, i) {
-    //     return blcks_ds.map(function(row) {
-    //         return row[i];
-    //     });
-    // });
-
-    // console.log(blcks_ds2);
-}
-
-function initGame(seedR2) {
-    g.s.game.s = {
-        assets: g.group(),
-        overlays: g.group()
-    };
-    g.s.game.s.overlays.add(pauseBtn);
-
-    blcks = g.group();
-    objs = g.group();
-    pobjs = g.group();
-
-    chrs = g.group();
-    chrsTP = g.group();
-    chrsAL = g.group();
-
-    chrsAL.visible = false
-
-    initChances();
-
-    inv = {
-        // wood: 4 // 4 * wood
-    };
-
-    makeChar(0 + tSize / 2, 0 + tSize / 2, "Light", 15, [
-        "waterwalker"
-    ]);
-
-    initSeed(seedR2);
-
-    fpsi = 0;
-    cntr = 0;
-
-    initChunks();
-
-    g.s.game.s.assets.add(blcks, objs, pobjs, chrs);
-}
-
 function setup() {
+    g.s.loading.visible = false;
+    g.s.loading.renderable = false;
+    g.s.loading.remove();
+
     music = g.sound("audio/soundtrack/Rebouz - Raindrops.mp3");
     music.loop = true;
     music.volume = 0.0175;
@@ -447,6 +141,9 @@ function setup() {
             "white"
         )
     );
+    header2.alpha = 0;
+    g.fadeIn(header2, 60, false, "smoothstepCubed");
+
     header.putCenter(header2);
     g.stage.putCenter(header);
 
@@ -458,7 +155,7 @@ function setup() {
     header.putBottom(playBtn);
     playBtn.interact = true;
     playBtn.release = () => {
-        initGame();
+        initGame(38);
         g.state = game;
     };
 
@@ -562,7 +259,7 @@ var ChrTextPop = function ChrTextPop(cI, text, clr) {
 
     var dIF = 60;
     (function(_cI, _chrTP) {
-        var chrTPani = g.fadeOut(_chrTP, dIF, 0);
+        var chrTPani = g.fadeOut(_chrTP, dIF, false);
         var chrTPani2 = g.breathe(_chrTP, 1.6, 1.2, dIF / 2);
         chrTPani.onComplete = () => {
             try {
@@ -649,6 +346,10 @@ function setScreen(nS) {
         }
     }
     ButtonInteracts();
+}
+
+function none() {
+    setScreen("none");
 }
 
 function main() {
@@ -859,6 +560,6 @@ window.addEventListener("resize", function(event) {
     scaleToWindow(document.querySelector("#ui"));
 });
 
-g.s = [];
+g.s = {};
 
 g.start();
