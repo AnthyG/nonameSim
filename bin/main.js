@@ -2,6 +2,9 @@
 
 let thingsToLoad = [
     "images/header.png",
+
+    "images/tree3.json",
+
     "audio/soundtrack/Rebouz - Raindrops.mp3"
 ];
 
@@ -446,7 +449,11 @@ function game() {
                     // blcks_ds2[blcks_ds2.length - i][i2] = b.chnc.ds;
                 }
 
-                b.fillStyle = b.chnc.clr;
+                console.log(b.chnc.l === "wood" ? typeof b.chnc.clr === "string" : undefined);
+                if (typeof b.chnc.clr === "string")
+                    b.fillStyle = b.chnc.clr;
+                else
+                    b.show(b.chnc.rsrcs.a);
 
                 b.children[0].text = b.chnc.rsrcs.a;
                 b.putCenter(b.children[0]);

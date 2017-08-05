@@ -1,11 +1,27 @@
 var makeBlock = function makeBlock(Cx, Cy, bx, by, r, chnc) {
-    var b = g.rectangle(
-        tSize,
-        tSize,
-        chnc.clr,
-        // "red",
-        // 2
-    );
+    if (typeof chnc.clr === "string") {
+        var b = g.rectangle(
+            tSize,
+            tSize,
+            chnc.clr,
+            // "red",
+            // 2
+        );
+    } else {
+        var bFrames = [];
+
+        for (i = 0; i < chances[chancesRef[chnc.l]].rsrcs.a + 1; i++) {
+            bFrames[i] = chnc.clr[0] + i + ".png";
+        }
+
+        var b = g.sprite(
+            bFrames,
+            tSize,
+            tSize
+        );
+
+        b.show(chnc.rsrcs.a);
+    }
 
     var bA = b.addChild(
         g.text(
@@ -40,15 +56,15 @@ var makeChunk = function makeChunk(x, y) {
         rightC = chnks.hasOwnProperty((x + 1) + "," + y),
         bottomC = chnks.hasOwnProperty(x + "," + (y + 1));
 
-    console.log(chnks,
-        chnks[x + "," + (y - 1)],
-        chnks[(x - 1) + "," + y],
-        chnks[(x + 1) + "," + y],
-        chnks[x + "," + (y + 1)]
-    );
+    // console.log(chnks,
+    //     chnks[x + "," + (y - 1)],
+    //     chnks[(x - 1) + "," + y],
+    //     chnks[(x + 1) + "," + y],
+    //     chnks[x + "," + (y + 1)]
+    // );
 
-    console.log(x, y);
-    console.log(topC, rightC, bottomC, leftC);
+    // console.log(x, y);
+    // console.log(topC, rightC, bottomC, leftC);
 
     // first is 0,0
     // it has no neighbors (all 4 above vars = false),
@@ -58,7 +74,7 @@ var makeChunk = function makeChunk(x, y) {
     var ri = Math.seed(seed * (y + seed))();
     var ri2 = Math.seed(ri * (x + seed))();
 
-    console.log(ri2);
+    // console.log(ri2);
 
     // All following `tNr`'s are -1 because array's start with 0, not 1.
     var tNr1 = tNr - 1;
@@ -104,7 +120,7 @@ var makeChunk = function makeChunk(x, y) {
         )
     );
 
-    console.log(ris2);
+    // console.log(ris2);
 
     // Do the chnc-thingies
     var fchncs = [];
@@ -114,7 +130,7 @@ var makeChunk = function makeChunk(x, y) {
         fchncs[i] = JSON.parse(JSON.stringify(chances[cir]));
     }
 
-    console.log(fchncs);
+    // console.log(fchncs);
 
     // Add the blocks to the chnk
     chnk[0][0] = {
@@ -138,7 +154,7 @@ var makeChunk = function makeChunk(x, y) {
     // chnk[0][tNr1] = makeBlock(x, y, 0, tNr1, ris2[2], fchncs[2]);
     // chnk[tNr1][tNr1] = makeBlock(x, y, tNr1, tNr1, ris2[3], fchncs[3]);
 
-    console.log(chnk[0][0], chnk[tNr1][0], chnk[0][tNr1], chnk[tNr1][tNr1]);
+    // console.log(chnk[0][0], chnk[tNr1][0], chnk[0][tNr1], chnk[tNr1][tNr1]);
 
     // Generate all in-between tiles for the left side
     var eiA = interpolationArray(
@@ -146,7 +162,7 @@ var makeChunk = function makeChunk(x, y) {
         chancesRef[fchncs[1].l],
         tNr1
     );
-    console.log("Left", eiA);
+    // console.log("Left", eiA);
     for (var i = 0; i < eiA.length; i++) {
         var _ri = Math.seed(ri2 * (0 * tSize + seed))();
         var _ri2 = Math.seed(ris[0] * (i * tSize + seed))();
@@ -167,7 +183,7 @@ var makeChunk = function makeChunk(x, y) {
         chancesRef[fchncs[3].l],
         tNr1
     );
-    console.log("Right", eiA);
+    // console.log("Right", eiA);
     for (var i = 0; i < eiA.length; i++) {
         var _ri = Math.seed(ri2 * (0 * tSize + seed))();
         var _ri2 = Math.seed(ris[0] * (i * tSize + seed))();
@@ -182,11 +198,11 @@ var makeChunk = function makeChunk(x, y) {
         // chnk[tNr1][i + 1] = makeBlock(x, y, i + 1, tNr1, _ri2, chnc2);
     }
 
-    console.log(chnk);
+    // console.log(chnk);
 
     // Generate all in-between tiles for the y-axis
     for (var i = 0; i < tNr; i++) {
-        console.log(i, chnk[i][0].chnc.l, chnk[i][tNr1].chnc.l);
+        // console.log(i, chnk[i][0].chnc.l, chnk[i][tNr1].chnc.l);
 
         var eiA = interpolationArray(
             chancesRef[chnk[i][0].chnc.l],
@@ -210,7 +226,7 @@ var makeChunk = function makeChunk(x, y) {
         // console.log(chnk[i]);
     }
 
-    console.log(chnk);
+    // console.log(chnk);
 
     chnks[x + "," + y] = chnk;
 

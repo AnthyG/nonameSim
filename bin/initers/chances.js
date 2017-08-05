@@ -50,9 +50,17 @@ function initChances() {
             for (var x in tO) {
                 var y = typeof tO[x];
 
-                // console.log(ptO + x + " :: " + (eval("typeof " + ptO + x)) + " :: " + y);
-                if (eval("typeof " + ptO + x + " !== \"" + y + "\"")) {
+                // console.log("\n" + ptO + x + " :: " + (eval("typeof " + ptO + x)) + " :: " + y);
+                if (eval("typeof " + ptO + x + " !== \"" + y + "\"") && (x !== "clr" && eval("typeof " + ptO + x + " !== \"object\""))) {
                     nerr = false;
+                } else if (x === "clr" && eval("typeof " + ptO + x + " === \"object\"")) {
+                    nerr = eval(ptO + x + ".length") > 0;
+                    // console.log(nerr);
+
+                    if (nerr) {
+                        // console.log("exChnc." + ptO + x + " = " + ptO + x);
+                        eval("exChnc." + ptO + x + " = " + ptO + x);
+                    }
                 } else {
                     var nerr2 = true;
                     if (y === "object")
@@ -98,7 +106,10 @@ function initChances() {
     );
     new_chnc(
         "wood",
-        "#2ABA66",
+        // "#2ABA66",
+        [
+            "tree3"
+        ],
         15,
         1.5, {
             "a": 3,
