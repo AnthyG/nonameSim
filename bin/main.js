@@ -69,7 +69,9 @@ let seedR,
 let chancesRef,
     chances;
 
-var chnks,
+var cam,
+    oldcam,
+    chnks,
     chnks2;
 
 let inv, // Inventory
@@ -362,6 +364,12 @@ function pause() {
 
 function game() {
     setScreen("game");
+
+    renderCam(
+        cam.vp,
+        cam.x,
+        cam.y
+    );
 
     var uDone = false;
     if (fpsi >= g.fps) {

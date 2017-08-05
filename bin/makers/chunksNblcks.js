@@ -55,8 +55,8 @@ var makeChunk = function makeChunk(x, y) {
     // so it has to randomly generate all 4 corners
 
     // Generate Chunk-ri (y) and ri2 (x)
-    var ri = Math.seed(seed * (y + 1))();
-    var ri2 = Math.seed(ri * (x + 1))();
+    var ri = Math.seed(seed * (y + seed))();
+    var ri2 = Math.seed(ri * (x + seed))();
 
     console.log(ri2);
 
@@ -68,39 +68,39 @@ var makeChunk = function makeChunk(x, y) {
     var ris2 = [];
 
     // Top left
-    ris[0] = Math.seed(ri2 * (0 * tSize + 1))();
+    ris[0] = Math.seed(ri2 * (0 * tSize + ri2))();
     ris2[0] = (
         leftC ? chnks[(x - 1) + "," + y][0][tNr1].r :
         (
             topC ? chnks[x + "," + (y - 1)][tNr1][0].r :
-            Math.seed(ris[0] * (0 * tSize + 1))()
+            Math.seed(ris[0] * (0 * tSize + ri2))()
         )
     );
     // Top right
-    ris[1] = Math.seed(ri2 * (0 * tSize + 1))();
+    ris[1] = Math.seed(ri2 * (0 * tSize + ri2))();
     ris2[1] = (
         topC ? chnks[x + "," + (y - 1)][tNr1][tNr1].r :
         (
             rightC ? chnks[(x + 1) + "," + y][0][0].r :
-            Math.seed(ris[1] * (tNr1 * tSize + 1))()
+            Math.seed(ris[1] * (tNr1 * tSize + ri2))()
         )
     );
     // Bottom left
-    ris[2] = Math.seed(ri2 * (tNr1 * tSize + 1))();
+    ris[2] = Math.seed(ri2 * (tNr1 * tSize + ri2))();
     ris2[2] = (
         leftC ? chnks[(x - 1) + "," + y][tNr1][tNr1].r :
         (
             bottomC ? chnks[x + "," + (y + 1)][0][0].r :
-            Math.seed(ris[2] * (0 * tSize + 1))()
+            Math.seed(ris[2] * (0 * tSize + ri2))()
         )
     );
     // Bottom right
-    ris[3] = Math.seed(ri2 * (tNr1 * tSize + 1))();
+    ris[3] = Math.seed(ri2 * (tNr1 * tSize + ri2))();
     ris2[3] = (
         bottomC ? chnks[x + "," + (y + 1)][0][tNr1].r :
         (
             rightC ? chnks[(x + 1) + "," + y][tNr1][0].r :
-            Math.seed(ris[3] * (tNr1 * tSize + 1))()
+            Math.seed(ris[3] * (tNr1 * tSize + ri2))()
         )
     );
 
@@ -148,8 +148,8 @@ var makeChunk = function makeChunk(x, y) {
     );
     console.log("Left", eiA);
     for (var i = 0; i < eiA.length; i++) {
-        var _ri = Math.seed(ri2 * (0 * tSize + 1))();
-        var _ri2 = Math.seed(ris[0] * (i * tSize + 1))();
+        var _ri = Math.seed(ri2 * (0 * tSize + seed))();
+        var _ri2 = Math.seed(ris[0] * (i * tSize + seed))();
 
         var cir = eiA[i];
         var chnc2 = JSON.parse(JSON.stringify(chances[cir]));
@@ -169,8 +169,8 @@ var makeChunk = function makeChunk(x, y) {
     );
     console.log("Right", eiA);
     for (var i = 0; i < eiA.length; i++) {
-        var _ri = Math.seed(ri2 * (0 * tSize + 1))();
-        var _ri2 = Math.seed(ris[0] * (i * tSize + 1))();
+        var _ri = Math.seed(ri2 * (0 * tSize + seed))();
+        var _ri2 = Math.seed(ris[0] * (i * tSize + seed))();
 
         var cir = eiA[i];
         var chnc2 = JSON.parse(JSON.stringify(chances[cir]));
@@ -195,8 +195,8 @@ var makeChunk = function makeChunk(x, y) {
         );
         // console.log(eiA);
         for (var i2 = 0; i2 < eiA.length; i2++) {
-            var _ri = Math.seed(ri2 * (i * tSize + 1))();
-            var _ri2 = Math.seed(ris[0] * (i2 * tSize + 1))();
+            var _ri = Math.seed(ri2 * (i * tSize + seed))();
+            var _ri2 = Math.seed(ris[0] * (i2 * tSize + seed))();
 
             var cir = eiA[i2];
             var chnc2 = JSON.parse(JSON.stringify(chances[cir]));

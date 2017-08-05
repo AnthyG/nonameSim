@@ -40,8 +40,19 @@ function initGame(seedR2, iX, iY, sX, sY) {
     fpsi = 0;
     cntr = 0;
 
-    initChunks(iX, iY, sX, sY);
+    // initChunks(iX, iY, sX, sY);
+    cam = {
+        "x": 0,
+        "y": 0,
+        "vp": 1
+    };
+    oldcam = {
+        "x": undefined,
+        "y": undefined,
+        "vp": undefined
+    };
 
+    chnks2 = g.group();
     g.s.game.s.assets.add(chnks2, blcks, objs, pobjs, chrs);
 
     g.s.game.s.bg.layer = 1;
