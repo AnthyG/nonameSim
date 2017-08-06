@@ -14,7 +14,7 @@ function renderCam(vp, sX, sY) {
                 var newChnk = g.group();
 
                 console.log("Setting chunks position", i, i2, i * tSize * tNr, i2 * tSize * tNr);
-                newChnk.setPosition(i * tSize * tNr, i2 * tSize * tNr);
+                newChnk.setPosition(i2 * tSize * tNr, i * tSize * tNr);
 
                 var chnk = makeChunk(i, i2);
                 console.log(chnk);
@@ -23,7 +23,7 @@ function renderCam(vp, sX, sY) {
 
                     for (var i4 = 0; i4 < chnk[i3].length; i4++) {
                         var cd = chnk[i3][i4];
-                        var mb = makeBlock(i, i2, i4, i3, cd.r, cd.chnc);
+                        var mb = makeBlock(i, i2, i3, i4, cd.r, cd.chnc);
                         nCr.addChild(mb);
                     }
                 }

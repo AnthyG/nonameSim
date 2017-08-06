@@ -382,87 +382,96 @@ function game() {
         // console.log("UDONE", uDone);
     }
 
-    for (var i = 0; i < blcks.children.length; i++) {
-        var blcksI = blcks.children[i];
-        for (var i2 = 0; i2 < blcksI.children.length; i2++) {
-            var b = blcksI.children[i2];
 
-            if (uDone) {
-                if (b.chnc.rsrcs.d > 0) {
-                    //b.chnc.rsrcs.d--;
-                }
+    // New loop
 
-                var
-                    topT = i === 0,
-                    leftT = i2 === 0,
-                    rightT = i2 === tNr - 1,
-                    bottomT = i === tNr - 1,
-                    rid;
+    // for (var i = 0; i < chnks2.children.length; i++) {
 
-                rid = (topT ? blcks.children[i + 1].children[i2].r : 0);
-                rid += (leftT ? blcks.children[i].children[i2 + 1].r : 0);
-                rid += (rightT ? blcks.children[i].children[i2 - 1].r : 0);
-                rid += (bottomT ? blcks.children[i - 1].children[i2].r : 0);
+    // }
 
-                // console.log(i + " :: " + rid);
-                if (!topT && !leftT && !rightT && !bottomT) {
-                    // console.log(i + " :: " + i2);
-                    rid += blcks.children[i + 1].children[i2].r +
-                        blcks.children[i].children[i2 + 1].r +
-                        blcks.children[i].children[i2 - 1].r +
-                        blcks.children[i - 1].children[i2].r;
-                }
+    // Old loop
 
-                /*console.log("A: " + b.r + " :: " + b.chnc.rsrcs.d
-                    + " :: " + b.chnc.rsrcs.a + " :: " + rid);*/
-                b.r = Math.seed(b.r * (b.chnc.rsrcs.d / 100.0 + 1) *
-                    (b.chnc.rsrcs.a + 3) * rid)();
-                // console.log("A2: " + b.r);
+    // for (var i = 0; i < blcks.children.length; i++) {
+    //     var blcksI = blcks.children[i];
+    //     for (var i2 = 0; i2 < blcksI.children.length; i2++) {
+    //         var b = blcksI.children[i2];
 
-                if (b.chnc.rsrcs.d === 0 || b.chnc.rsrcs.a === 0) {
-                    var ri2 = Math.seed(b.r * cntr)();
-                    /*
-                    for (var cir = 0; cir < b.chnc.rsrcs.dT.length && ri2 >= b.chnc.rsrcs.dT[cir][2]; cir++);
-                    */
-                    var cir;
-                    for (var cir2 in b.chnc.rsrcs.dT) {
-                        if (ri2 >= b.chnc.rsrcs.dT[cir2]) {
-                            // console.log("B: " + i + " :: " + i2 + " :: " + cir);
-                            continue;
-                        } else {
-                            cir = cir2;
-                            break;
-                        }
-                    }
-                    /* console.log("C: " + b.r + " :: " + cntr + " :: " + ri2
-                        + " :: " + b.chnc.rsrcs.dT["dirt"] + " :: " + cir);
-                    */
+    //         if (uDone) {
+    //             if (b.chnc.rsrcs.d > 0) {
+    //                 //b.chnc.rsrcs.d--;
+    //             }
 
-                    var chnc = JSON.parse(JSON.stringify(chances[chancesRef[cir]]));
+    //             var
+    //                 topT = i === 0,
+    //                 leftT = i2 === 0,
+    //                 rightT = i2 === tNr - 1,
+    //                 bottomT = i === tNr - 1,
+    //                 rid;
 
-                    console.log("Assigning new chance to ", i, i2, b.r, b.chnc, chnc);
+    //             rid = (topT ? blcks.children[i + 1].children[i2].r : 0);
+    //             rid += (leftT ? blcks.children[i].children[i2 + 1].r : 0);
+    //             rid += (rightT ? blcks.children[i].children[i2 - 1].r : 0);
+    //             rid += (bottomT ? blcks.children[i - 1].children[i2].r : 0);
 
-                    b.r = ri2;
-                    b.chnc = chnc;
+    //             // console.log(i + " :: " + rid);
+    //             if (!topT && !leftT && !rightT && !bottomT) {
+    //                 // console.log(i + " :: " + i2);
+    //                 rid += blcks.children[i + 1].children[i2].r +
+    //                     blcks.children[i].children[i2 + 1].r +
+    //                     blcks.children[i].children[i2 - 1].r +
+    //                     blcks.children[i - 1].children[i2].r;
+    //             }
 
-                    blcks_ds2[i2][i] = b.chnc.ds;
-                    // blcks_ds2[blcks_ds2.length - i][i2] = b.chnc.ds;
-                }
+    //             /*console.log("A: " + b.r + " :: " + b.chnc.rsrcs.d
+    //                 + " :: " + b.chnc.rsrcs.a + " :: " + rid);*/
+    //             b.r = Math.seed(b.r * (b.chnc.rsrcs.d / 100.0 + 1) *
+    //                 (b.chnc.rsrcs.a + 3) * rid)();
+    //             // console.log("A2: " + b.r);
 
-                console.log(b.chnc.l === "wood" ? typeof b.chnc.clr === "string" : undefined);
-                if (typeof b.chnc.clr === "string")
-                    b.fillStyle = b.chnc.clr;
-                else
-                    b.show(b.chnc.rsrcs.a);
+    //             if (b.chnc.rsrcs.d === 0 || b.chnc.rsrcs.a === 0) {
+    //                 var ri2 = Math.seed(b.r * cntr)();
+    //                 /*
+    //                 for (var cir = 0; cir < b.chnc.rsrcs.dT.length && ri2 >= b.chnc.rsrcs.dT[cir][2]; cir++);
+    //                 */
+    //                 var cir;
+    //                 for (var cir2 in b.chnc.rsrcs.dT) {
+    //                     if (ri2 >= b.chnc.rsrcs.dT[cir2]) {
+    //                         // console.log("B: " + i + " :: " + i2 + " :: " + cir);
+    //                         continue;
+    //                     } else {
+    //                         cir = cir2;
+    //                         break;
+    //                     }
+    //                 }
+    //                 /* console.log("C: " + b.r + " :: " + cntr + " :: " + ri2
+    //                     + " :: " + b.chnc.rsrcs.dT["dirt"] + " :: " + cir);
+    //                 */
 
-                b.children[0].text = b.chnc.rsrcs.a;
-                b.putCenter(b.children[0]);
+    //                 var chnc = JSON.parse(JSON.stringify(chances[chancesRef[cir]]));
 
-                // console.log(i, i2, blcks.children[i].children[i2], b);
-                blcks.children[i].children[i2] = b;
-            }
-        }
-    }
+    //                 console.log("Assigning new chance to ", i, i2, b.r, b.chnc, chnc);
+
+    //                 b.r = ri2;
+    //                 b.chnc = chnc;
+
+    //                 blcks_ds2[i2][i] = b.chnc.ds;
+    //                 // blcks_ds2[blcks_ds2.length - i][i2] = b.chnc.ds;
+    //             }
+
+    //             console.log(b.chnc.l === "wood" ? typeof b.chnc.clr === "string" : undefined);
+    //             if (typeof b.chnc.clr === "string")
+    //                 b.fillStyle = b.chnc.clr;
+    //             else
+    //                 b.show(b.chnc.rsrcs.a);
+
+    //             b.children[0].text = b.chnc.rsrcs.a;
+    //             b.putCenter(b.children[0]);
+
+    //             // console.log(i, i2, blcks.children[i].children[i2], b);
+    //             blcks.children[i].children[i2] = b;
+    //         }
+    //     }
+    // }
 
     for (var i in chrs.children) {
         var chrC = chrs.children[i];

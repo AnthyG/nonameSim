@@ -1,12 +1,12 @@
 function initChances() {
     chancesRef = {
-        "dirt": 0
+        "water": 0
     };
     chances = [{
-        "l": "dirt", // label
-        "clr": "#AA8E69", // colour
-        "c": 10, // chance
-        "ds": 1,
+        "l": "water", // label
+        "clr": "#3BAFDA", // colour
+        "c": 13, // chance
+        "ds": 0,
         /* "density speed", how fast to travel
         A weight of 0 denotes a wall.
         A weight cannot be negative.
@@ -14,15 +14,16 @@ function initChances() {
         A weight can contain decimal values (greater than 1).
         */
         "rsrcs": { // resources
-            "a": -1, // amount (-2 = infinite, -1 = none, 0 = depleted)
-            "cd": 1, // cooldown in seconds, to prevent click-spamming (bringt hier aba nix, weil a=-1 is)
-            "d": 5, // degrade-time in seconds (-1 = infinite)
+            "a": -2, // amount (-2 = infinite, -1 = none, 0 = depleted)
+            "cd": 2, // cooldown in seconds, to prevent click-spamming (bringt hier aba nix, weil a=-1 is)
+            "d": 70, // degrade-time in seconds (-1 = infinite)
             "dT": { // degrades to..
-                "dirt": 25,
-                "grass": 40,
-                "wood": 5,
-                "water": 15,
-                "rocks": 15
+                "sand": 23,
+                "dirt": 15,
+                "grass": 16,
+                "wood": 7,
+                "water": 21,
+                "rocks": 18
             }
         }
     }];
@@ -89,9 +90,42 @@ function initChances() {
     }
 
     new_chnc(
+        "sand",
+        "#E8CE4D",
+        11,
+        1.3, {
+            "a": 4,
+            "cd": 2,
+            "d": 5,
+            "dT": {
+                "dirt": 15,
+                "grass": 65,
+                "wood": 15,
+                "rocks": 10
+            }
+        }
+    );
+    new_chnc(
+        "dirt",
+        "#AA8E69",
+        10,
+        1, {
+            "a": -1,
+            "cd": 1,
+            "d": 5,
+            "dT": {
+                "dirt": 25,
+                "grass": 40,
+                "wood": 5,
+                "water": 15,
+                "rocks": 15
+            }
+        }
+    );
+    new_chnc(
         "grass",
         "#8CC152",
-        55,
+        44,
         1.1, {
             "a": 1,
             "cd": 2,
@@ -119,23 +153,6 @@ function initChances() {
                 "dirt": 60,
                 "grass": 25,
                 "rocks": 15
-            }
-        }
-    );
-    new_chnc(
-        "water",
-        "#3BAFDA",
-        13,
-        0, {
-            "a": -2,
-            "cd": 2,
-            "d": 70,
-            "dT": {
-                "dirt": 25,
-                "grass": 32,
-                "wood": 7,
-                "water": 20,
-                "rocks": 16
             }
         }
     );
