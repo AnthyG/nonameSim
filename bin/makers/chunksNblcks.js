@@ -1,18 +1,41 @@
 var makeBlock = function makeBlock(Cx, Cy, bx, by, r, chnc) {
-    if (typeof chnc.clr === "string") {
+    var cc = chnc.clr;
+    if (typeof cc === "string") {
         var b = g.rectangle(
             tSize,
             tSize,
-            chnc.clr,
+            cc,
             // "red",
             // 2
         );
     } else {
         var bFrames = [];
 
-        for (i = 0; i < chances[chancesRef[chnc.l]].rsrcs.a + 1; i++) {
-            bFrames[i] = chnc.clr[0] + i + ".png";
+        if (cc.hasOwnProperty("A") && cc.A !== "") {
+            for (var i = -2; i < chances[chancesRef[chnc.l]].rsrcs.a + 1; i++) {
+                bFrames[i] = cc.A.replace(/\[A\]/gm, i) + ".png";
+            }
         }
+        for (var i in cc) {
+            // console.log(i, cc[i], bFrames[i]);
+            if (i !== "A" && typeof cc[i] === "string") {
+                bFrames[i] = cc[i] + ".png";
+            } else if (i !== "A") {
+                // Play frames 10 to 15:
+                // animatedSprite.playAnimation([10, 15]);
+
+                bFrames[i] = cc[i] + ".png";
+
+                // bFrames[i] = true;
+                // if (cc[i][0] === true) {
+                //     bFrames[i] = cc[i][1];
+                // }
+            }
+        }
+
+        // for (i = 0; i < chances[chancesRef[chnc.l]].rsrcs.a + 1; i++) {
+        //     bFrames[i] = cc[i] + ".png";
+        // }
 
         var b = g.sprite(
             bFrames,

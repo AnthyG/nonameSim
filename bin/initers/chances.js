@@ -4,7 +4,21 @@ function initChances() {
     };
     chances = [{
         "l": "water", // label
-        "clr": "#3BAFDA", // colour
+        // "clr": "#3BAFDA", // tile-colour
+        "clr": { // tile-images
+            // animated
+            "-2": "water1",
+            // "-2_0": "water1",
+            // "-2_1": "water2",
+            // "-2": [
+            //     "water1",
+            //     "water2"
+            // ],
+
+            // "A": "water[A]"
+
+            "0": "water0" // index
+        },
         "c": 13, // chance
         "ds": 0,
         /* "density speed", how fast to travel
@@ -55,7 +69,7 @@ function initChances() {
                 if (eval("typeof " + ptO + x + " !== \"" + y + "\"") && (x !== "clr" && eval("typeof " + ptO + x + " !== \"object\""))) {
                     nerr = false;
                 } else if (x === "clr" && eval("typeof " + ptO + x + " === \"object\"")) {
-                    nerr = eval(ptO + x + ".length") > 0;
+                    nerr = eval(ptO + x + ".length") > 0 || eval("Object.keys(" + ptO + x + ").length") > 0;
                     // console.log(nerr);
 
                     if (nerr) {
@@ -91,7 +105,11 @@ function initChances() {
 
     new_chnc(
         "sand",
-        "#E8CE4D",
+        // "#E8CE4D",
+        {
+            "A": "sand1", // "All", all rsrcs.a will use this
+            "0": "sand0" // index will override "all"
+        },
         11,
         1.3, {
             "a": 4,
@@ -141,9 +159,9 @@ function initChances() {
     new_chnc(
         "wood",
         // "#2ABA66",
-        [
-            "tree3"
-        ],
+        {
+            "A": "wood[A]" // "All", replace [A] with rsrcs.a
+        },
         15,
         1.5, {
             "a": 3,

@@ -3,7 +3,9 @@
 let thingsToLoad = [
     "images/header.png",
 
-    "images/tree3.json",
+    "images/water.json",
+    "images/sand.json",
+    "images/wood.json",
 
     "audio/soundtrack/Rebouz - Raindrops.mp3"
 ];

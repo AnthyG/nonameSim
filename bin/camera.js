@@ -4,6 +4,12 @@ function renderCam(vp, sX, sY) {
     var sY = sY || 0;
 
     if (vp !== oldcam.vp || sX !== oldcam.x || sY !== oldcam.y) {
+        oldcam = {
+            "x": sX,
+            "y": sY,
+            "vp": vp
+        };
+
         chnks = {};
         chnks2 = g.group();
 
@@ -38,12 +44,6 @@ function renderCam(vp, sX, sY) {
         //         return row[i];
         //     });
         // });
-
-        oldcam = {
-            "x": sX,
-            "y": sY,
-            "vp": vp
-        };
     } else {
         // console.log("SAME", sX, sY, vp, oldcam, cam);
     }
