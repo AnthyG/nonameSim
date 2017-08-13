@@ -3,6 +3,8 @@
 let thingsToLoad = [
     "images/header.png",
 
+    "bin/map.json",
+
     "images/water.json",
     "images/sand.json",
     "images/wood.json",
@@ -80,11 +82,12 @@ var cam,
     chnks2;
 
 let inv, // Inventory
-    blcks, // Blocks/ Tiles
-    // blcks_ds, // Block-Densities
-    blcks_ds2, // Block-Densities 2 (inverted)
-    objs, // Random-spawned objects
-    pobjs; // Player-made Objects
+    world;
+// blcks, // Blocks/ Tiles
+// // blcks_ds, // Block-Densities
+// blcks_ds2, // Block-Densities 2 (inverted)
+// objs, // Random-spawned objects
+// pobjs; // Player-made Objects
 
 let chrs, // Characters
     sChrs, // Selected Characters
@@ -112,7 +115,6 @@ function setup() {
     g.s.main = g.group();
     g.s.game = g.group();
     g.s.game.s = {
-        assets: g.group(),
         overlays: g.group()
     };
     g.s.pause = g.group();
@@ -210,104 +212,6 @@ function setup() {
     g.state = main;
 }
 
-var acts = {
-    "gather": function(chr, cI) {
-        var b = blcks.children[chr.cacty].children[chr.cactx];
-
-        var iI = b.chnc.rsrcs.a === -2;
-        if (b.chnc.rsrcs.a > 0 || iI) {
-            if (chr.invc < chr.invcm) {
-
-                // console.log("'" + chr.n + "' (#" + cI + ") gathering " + b.chnc.l + " at " + chr.cactx + ", " + chr.cacty, b.chnc);
-
-                if (!iI)
-                    b.chnc.rsrcs.a--;
-
-                var collected = false;
-                if (typeof chr.inv[b.chnc.l] === "undefined") {
-                    chr.inv[b.chnc.l] = 1;
-                    chr.invc++;
-                    collected = true;
-                } else {
-                    chr.inv[b.chnc.l]++;
-                    chr.invc++;
-                    collected = true;
-                }
-                if (collected)
-                    ChrTextPop(cI, b.chnc.l + " +1", "black");
-
-                chr.cldwn = b.chnc.rsrcs.cd;
-
-                blcks.children[chr.cacty].children[chr.cactx] = b;
-
-                chrs.children[cI].c = chr;
-            } else {
-                ChrTextPop(cI, "Inventory full", "red");
-            }
-        }
-    }
-};
-
-var ChrTextPop = function ChrTextPop(cI, text, clr) {
-    var chrTP = g.text(
-        text,
-        "8px Arial",
-        clr
-    );
-
-    chrs.children[cI].putCenter(chrTP);
-    chrs.children[cI].putTop(chrTP);
-
-    chrTP.setPivot(0.5, 0.5);
-
-    chrTP.vy = -1;
-
-    chrsTP.addChild(chrTP);
-
-    var dIF = 60;
-    (function(_cI, _chrTP) {
-        var chrTPani = g.fadeOut(_chrTP, dIF, false);
-        var chrTPani2 = g.breathe(_chrTP, 1.6, 1.2, dIF / 2);
-        chrTPani.onComplete = () => {
-            try {
-                g.remove(_chrTP);
-            } catch (err) {
-
-            }
-        };
-    })(cI, chrTP);
-}
-
-function moveChr(cI, byTo, bxTo, actI) {
-    console.log("Moving #" + cI + " to " + bxTo + " :: " + byTo + " || " + actI,
-        blcks_ds2[bxTo][byTo], blcks.children[byTo].children[bxTo].chnc.ds,
-        chrs.children[cI] ? true : false, blcks_ds2[bxTo][byTo] ? true : false, acts[actI] ? true : false);
-    if (chrs.children[cI] && typeof blcks_ds2[bxTo][byTo] === "number" && acts[actI]) {
-        var chrC = chrs.children[cI];
-        var chr = chrC.c;
-
-        // console.log(chrC, chr);
-
-        var graph = new Graph(blcks_ds2, {
-            "diagonal": true
-        });
-        var start = graph.grid[chr.bx][chr.by];
-        var end = graph.grid[bxTo][byTo];
-        var result = astar.search(graph, start, end, {
-            "closest": true,
-            "heuristic": astar.heuristics.diagonal
-        });
-
-        chr.movearr = result;
-
-        chr.cactx = bxTo;
-        chr.cacty = byTo;
-        chr.cactI = actI;
-
-        chrC.c = chr;
-    }
-}
-
 function ButtonInteracts() {
     if (g.s.game.visible === true) {
         pauseBtn.interact = true;
@@ -370,196 +274,11 @@ function pause() {
 function game() {
     setScreen("game");
 
-    renderCam(
-        cam.vp,
-        cam.x,
-        cam.y
-    );
-
     var uDone = false;
     if (fpsi >= g.fps) {
         fpsi = 0;
         cntr++;
         uDone = true;
-        // console.log("UDONE", uDone);
-    }
-
-
-    // New loop
-
-    // for (var i = 0; i < chnks2.children.length; i++) {
-
-    // }
-
-    // Old loop
-
-    // for (var i = 0; i < blcks.children.length; i++) {
-    //     var blcksI = blcks.children[i];
-    //     for (var i2 = 0; i2 < blcksI.children.length; i2++) {
-    //         var b = blcksI.children[i2];
-
-    //         if (uDone) {
-    //             if (b.chnc.rsrcs.d > 0) {
-    //                 //b.chnc.rsrcs.d--;
-    //             }
-
-    //             var
-    //                 topT = i === 0,
-    //                 leftT = i2 === 0,
-    //                 rightT = i2 === tNr - 1,
-    //                 bottomT = i === tNr - 1,
-    //                 rid;
-
-    //             rid = (topT ? blcks.children[i + 1].children[i2].r : 0);
-    //             rid += (leftT ? blcks.children[i].children[i2 + 1].r : 0);
-    //             rid += (rightT ? blcks.children[i].children[i2 - 1].r : 0);
-    //             rid += (bottomT ? blcks.children[i - 1].children[i2].r : 0);
-
-    //             // console.log(i + " :: " + rid);
-    //             if (!topT && !leftT && !rightT && !bottomT) {
-    //                 // console.log(i + " :: " + i2);
-    //                 rid += blcks.children[i + 1].children[i2].r +
-    //                     blcks.children[i].children[i2 + 1].r +
-    //                     blcks.children[i].children[i2 - 1].r +
-    //                     blcks.children[i - 1].children[i2].r;
-    //             }
-
-    //             /*console.log("A: " + b.r + " :: " + b.chnc.rsrcs.d
-    //                 + " :: " + b.chnc.rsrcs.a + " :: " + rid);*/
-    //             b.r = Math.seed(b.r * (b.chnc.rsrcs.d / 100.0 + 1) *
-    //                 (b.chnc.rsrcs.a + 3) * rid)();
-    //             // console.log("A2: " + b.r);
-
-    //             if (b.chnc.rsrcs.d === 0 || b.chnc.rsrcs.a === 0) {
-    //                 var ri2 = Math.seed(b.r * cntr)();
-    //                 /*
-    //                 for (var cir = 0; cir < b.chnc.rsrcs.dT.length && ri2 >= b.chnc.rsrcs.dT[cir][2]; cir++);
-    //                 */
-    //                 var cir;
-    //                 for (var cir2 in b.chnc.rsrcs.dT) {
-    //                     if (ri2 >= b.chnc.rsrcs.dT[cir2]) {
-    //                         // console.log("B: " + i + " :: " + i2 + " :: " + cir);
-    //                         continue;
-    //                     } else {
-    //                         cir = cir2;
-    //                         break;
-    //                     }
-    //                 }
-    //                 /* console.log("C: " + b.r + " :: " + cntr + " :: " + ri2
-    //                     + " :: " + b.chnc.rsrcs.dT["dirt"] + " :: " + cir);
-    //                 */
-
-    //                 var chnc = JSON.parse(JSON.stringify(chances[chancesRef[cir]]));
-
-    //                 console.log("Assigning new chance to ", i, i2, b.r, b.chnc, chnc);
-
-    //                 b.r = ri2;
-    //                 b.chnc = chnc;
-
-    //                 blcks_ds2[i2][i] = b.chnc.ds;
-    //                 // blcks_ds2[blcks_ds2.length - i][i2] = b.chnc.ds;
-    //             }
-
-    //             console.log(b.chnc.l === "wood" ? typeof b.chnc.clr === "string" : undefined);
-    //             if (typeof b.chnc.clr === "string")
-    //                 b.fillStyle = b.chnc.clr;
-    //             else
-    //                 b.show(b.chnc.rsrcs.a);
-
-    //             b.children[0].text = b.chnc.rsrcs.a;
-    //             b.putCenter(b.children[0]);
-
-    //             // console.log(i, i2, blcks.children[i].children[i2], b);
-    //             blcks.children[i].children[i2] = b;
-    //         }
-    //     }
-    // }
-
-    for (var i in chrs.children) {
-        var chrC = chrs.children[i];
-
-        let collision = g.contain(chrC, g.stage, false);
-
-        var chr = chrC.c;
-
-        if (uDone) {
-            if (chr.cmove) {
-                chr.bx = chr.cmove.x;
-                chr.by = chr.cmove.y;
-            }
-
-            if (chr.movearr.length > 0) {
-                var b = chr.movearr.shift();
-
-                chr.cmove = b;
-            } else {
-                chr.cmove = false;
-                chrC.vx = 0;
-                chrC.vy = 0;
-
-                if (chr.cactI && chr.cldwn === 0) {
-                    acts[chr.cactI](chr, i);
-                }
-
-                if (chr.cldwn > 0) {
-                    chr.cldwn--;
-                }
-
-                chrC.c = chr;
-            }
-        }
-
-        if (chr.cmove) {
-            var b = chr.cmove;
-            // console.log(">Move", b);
-
-            // Direction
-            var bcx = b.x - chr.bx,
-                bcy = b.y - chr.by;
-
-            // Goal-Coors
-            var gbx = b.x * tSize + tSize / 2,
-                gby = b.y * tSize + tSize / 2;
-
-            // Cur-Coors
-            var cbx = chr.bx * tSize + tSize / 2,
-                cby = chr.by * tSize + tSize / 2;
-
-            var bcx2 = gbx - cbx,
-                bcy2 = gby - cby;
-
-            // chrC.vx = bcx2 / g.fps;
-            // chrC.vy = bcx2 / g.fps;
-            var nx = chrC.x + bcx2 / g.fps,
-                ny = chrC.y + bcy2 / g.fps;
-            chrC.setPosition(nx, ny);
-
-            chrC.c = chr;
-        }
-
-        // if (chr.children.actline)
-        //     g.remove(chr.children.actline);
-
-        // chr.children.actline = g.line(
-        //     blcks.children[chr.cacty].children[chr.cactx].chnc.clr,
-        //     4,
-        //     chrC.centerX,
-        //     chrC.centerY,
-        //     blcks.children[chr.cacty].children[chr.cactx].centerX,
-        //     blcks.children[chr.cacty].children[chr.cactx].centerY
-        // );
-        // chrsAL.addChild(chr.children.actline);
-
-        chrC.layer = 1;
-
-        // console.log(chrC, chr);
-        g.move(chrC);
-    }
-
-    for (var i in chrsTP.children) {
-        var chrTP = chrsTP.children[i];
-
-        g.move(chrTP);
     }
 
     fpsi++;
