@@ -14,6 +14,8 @@ function initGame(seedR2, iX, iY, sX, sY) {
     };
     g.s.game.s.overlays.add(pauseBtn);
 
+    initMap();
+
     g.loader.resources["bin/map.json"].data = mapJSON;
     world = g.makeTiledWorld("bin/map.json", "images/timeBombPanic.png");
 }
